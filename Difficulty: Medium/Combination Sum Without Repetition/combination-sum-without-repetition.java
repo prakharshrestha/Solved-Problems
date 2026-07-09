@@ -6,30 +6,29 @@ class Solution {
 
         Arrays.sort(arr);
 
-        ArrayList<ArrayList<Integer>> ans = new ArrayList<>();
-        backtrack(0, arr, target, new ArrayList<>(), ans);
+        HashSet<ArrayList<Integer>> ans = new HashSet<>();
+        ArrayList<Integer> temp = new ArrayList<>();
 
-        return ans;
+        check(0, arr, temp, ans, target);
+
+        return new ArrayList<>(ans);
     }
 
-    void backtrack(int start, int[] arr, int target,ArrayList<Integer> temp, ArrayList<ArrayList<Integer>> ans) {
+    public void check(int i, int[] arr, ArrayList<Integer> temp, HashSet<ArrayList<Integer>> res, int target) {
 
         if (target == 0) {
-            ans.add(new ArrayList<>(temp));
+            res.add(new ArrayList<>(temp));
             return;
         }
 
-        for (int i = start; i < arr.length; i++) {
-
-            if (i > start && arr[i] == arr[i - 1])
-                continue;
-
-            if (arr[i] > target)
-                break;
-
-            temp.add(arr[i]);
-            backtrack(i + 1, arr, target - arr[i], temp, ans);
-            temp.remove(temp.size() - 1);
+        if (i == arr.length || target < 0) {
+            return;
         }
+
+        temp.add(arr[i]);
+        check(i + 1, arr, temp, res, target - arr[i]);
+        temp.remove(temp.size() - 1);
+
+        check(i + 1, arr, temp, res, target);
     }
 }
