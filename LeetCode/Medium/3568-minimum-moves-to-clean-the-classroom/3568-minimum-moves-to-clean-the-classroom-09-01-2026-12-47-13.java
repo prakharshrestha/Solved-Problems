@@ -1,0 +1,66 @@
+class Solution {
+    private record State(int x, int y, int mask, int energy) {}; 
+    public int minMoves(String[] c, int e) {
+
+        int x = 0, y = 0, pos = 0; 
+        int row = c.length, col = c[0].length(); 
+        int lit[][] = new int[21][21]; 
+        for(int i = 0; i < row; i++) {
+            for(int j = 0; j < col; j++) {
+                if(c[i].charAt(j) == 'L') {
+                    lit[i][j] = pos++; 
+                }
+
+                if(c[i].charAt(j) == 'S') {
+                    x = i; 
+                    y = j; 
+                }
+            }
+        }
+        if(pos == 0) return 0; 
+
+        int mask = (1 << pos) - 1; 
+
+        Queue<State> q = new ArrayDeque<>(); 
+        q.offer(new State(x, y, mask, e)); 
+        int steps = 1; 
+
+        int dir[][] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}}; 
+        boolean vis[][][][] = new boolean[21][21][(1 << pos)][e + 1]; 
+        vis[x][y][mask][e] = true; 
+
+        while(q.size() > 0) {
+            int sz = q.size(); 
+            while(sz-- > 0) {
+                State cur = q.poll(); 
+                int curMask = cur.mask; 
+                int curEn = cur.energy; 
+
+                if(curEn == 0) continue; 
+
+                for(int d[]: dir) {
+
+                    int nx = cur.x + d[0], ny = cur.y + d[1]; 
+
+                    if(nx < 0 || ny < 0 || nx >= row || ny >= col)
+                    continue;  
+                    if(c[nx].charAt(ny) == 'X') 
+                    continue; 
+                    int nwMask = curMask, nwEn = curEn; 
+                    if(c[nx].charAt(ny) == 'L') {
+                        nwMask &= ~(1 << lit[nx][ny]);
+                    }
+                    if(nwMask == 0) return steps; 
+                    nwEn -= 1; 
+                    if(c[nx].charAt(ny) == 'R') nwEn = e; 
+                    if(!vis[nx][ny][nwMask][nwEn] && nwEn > 0) {
+                        vis[nx][ny][nwMask][nwEn] = true; 
+                        q.offer(new State(nx, ny, nwMask, nwEn)); 
+                    }
+                }
+            }
+            steps++; 
+        }
+        return -1; 
+    }
+}
